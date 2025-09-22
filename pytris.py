@@ -381,7 +381,7 @@ screen=pygame.display.set_mode((500,600))
 surface=pygame.Surface((blockSize*10,blockSize*20))
 surfacePreview=pygame.Surface((blockSize*4,blockSize*4))
 text_surface = my_font.render('0', False, (255, 255, 255))
-pygame.display.set_caption("Tetris")
+pygame.display.set_caption("PyTris")
 
 
 running=True
@@ -411,7 +411,9 @@ while running:
             if event.type==pygame.QUIT:
                 running=False
             if event.type==pygame.KEYDOWN:
-                if event.key==pygame.K_SPACE or event.key==pygame.K_UP:
+                if event.key==pygame.K_q:
+                    running=False
+                if event.key==pygame.K_SPACE or event.key==pygame.K_UP or event.key==pygame.K_w:
                     rotate()
 
         keys = pygame.key.get_pressed()
@@ -446,8 +448,11 @@ while running:
         screen.blit(text_surface, (25,220))
 
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
+            if event.type==pygame.QUIT or event.type==pygame.K_q:
                 running=False
+            if event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_q:
+                        running=False
         keys=pygame.key.get_pressed()
         if keys[pygame.K_r]:
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, 500, 600))
