@@ -25,4 +25,4 @@ Then you can run the game with:
 + __Paul File__ - coding of the game
 
 ## License
-This project is licensed under the GNU GPL License - see the LICENSE.md file for details
+This project is licensed under the GNU GPL License - see the [LICENSE.md](LICENSE.md) file for details
