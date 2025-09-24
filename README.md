@@ -15,8 +15,10 @@ Then you can run the game with:
 + *D/Right arrow* - move block right
 + *S/Down arrow* - move block down
 + *W/Up arrow/Space* - rotate block
++ *P* - pause game
 + *R* - restart game
 + *Q* - quit/close game
+
 
 ## Screenshot
 ![Game in action](/Screenshot.png)
