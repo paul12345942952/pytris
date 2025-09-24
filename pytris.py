@@ -175,10 +175,10 @@ class TetrisGame:
         
         self.currentFallingPiece=None
 
-        block=random.choice(self.blocks)[0]
         emptyLineCount=0
+        block=random.choice(self.blocks)[0]
         for y in block:
-            if not 0 in y:
+            if all(x==0 for x in y):
                 emptyLineCount+=1
         pos=[int((10-len(block[0]))/2),-emptyLineCount-1]
         self.nextFallingPiece=FallingPiece(block,pos,0)
