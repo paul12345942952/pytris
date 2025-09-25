@@ -1,7 +1,7 @@
 # PyTris
 A simplified Version of Tetris done in Python.
 
-This Project is not yet finished, please be patient, as i am writing this in my free time.
+This Project is not yet finished, please be patient, as I am writing this in my free time.
 
 ## Prerequisites
 To run this program you need to install pygame:  
