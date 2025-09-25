@@ -39,7 +39,9 @@ class TetrisGame:
         self.inputHandler=InputHandler()
 
         self.field=[[0 for x in range(10)] for y in range(20)]
+        self.lines=0
         self.score=0
+        self.level=0
         self.gameOver=False
         self.paused=False
         self.blockSize=30
@@ -180,6 +182,8 @@ class TetrisGame:
         for y in block:
             if all(x==0 for x in y):
                 emptyLineCount+=1
+            else:
+                break
         pos=[int((10-len(block[0]))/2),-emptyLineCount-1]
         self.nextFallingPiece=FallingPiece(block,pos,0)
 
@@ -206,7 +210,9 @@ class TetrisGame:
         for y in block:
             if all(x==0 for x in y):
                 emptyLineCount+=1
-        pos=[int((10-len(block[0]))/2),-emptyLineCount-1]
+            else:
+                break
+        pos=[int((10-len(block[0]))/2),-emptyLineCount-1] 
         self.nextFallingPiece=FallingPiece(block,pos,0)
 
         self.nextPieceReady=False
@@ -335,35 +341,42 @@ class TetrisGame:
         for y in range(len(self.field)):
             if 0 not in self.field[y]:
                 linesCleared+=1
-                self.score+=1
-                self.renderer.highLightLine(y)
+                self.lines+=1
+                self.renderer.highlightLine(y)
             else:
                 newField.append(self.field[y])
-        highlight_delay = 1000  # milliseconds
-        last_time = pygame.time.get_ticks()
-        while True:
-            now = pygame.time.get_ticks()
-            if now-last_time>=highlight_delay:
-                break
         
+        match(linesCleared):
+            case 1:
+                self.score+=100*(self.level+1)
+            case 2:
+                self.score+=300*(self.level+1)
+            case 3:
+                self.score+=500*(self.level+1)
+            case 4:
+                self.score+=800*(self.level+1)
+
         for _ in range(linesCleared):
             newField.insert(0, [0 for x in range(10)])
         
-        self.renderer.drawScore(self.score)
+        self.renderer.drawScore(self.lines,self.score,self.level)
         self.field=newField
 
     def checkGameOver(self):
         if (self.field[0][3] !=0 or self.field[0][4] !=0 or self.field[0][4]!=0 or self.field[0][4] !=0) and self.nextPieceReady:
             self.gameOver=True
+            self.renderer.highlightGameOver()
 
     def reset(self):
+        self.lines=0
         self.score=0
+        self.level=0
         self.field=[[0 for x in range(10)] for y in range(20)]
         self.currentFallingPiece=None
         self.nextPieceReady=True
         self.gameOver=False
         self.paused=False
-        self.renderer.drawScore(0)
+        self.renderer.drawScore(0,0,0)
         pygame.draw.rect(self.renderer.screen, (0, 0, 0), (0, 0, 500, 600))
 
     def run(self):
@@ -387,9 +400,10 @@ class TetrisGame:
             pygame.display.update()
             return
 
-        self.move_delay=1000-self.score*10 if 1000-self.score*10 >=100 else 100
+        self.level=self.lines//10 if self.lines<=99 else 9
+        self.move_delay=1000-self.level*100
         self.renderer.drawField(self.field)
-        self.renderer.drawScore(self.score)
+        self.renderer.drawScore(self.lines,self.score,self.level)
         self.genFallingBlock()
         self.renderer.drawPreview(self.nextFallingPiece)
 
@@ -475,13 +489,65 @@ class Renderer:
                 if structure[y][x]!=0:
                     pygame.draw.rect(self.surfacePreview, self.block_colors[structure[y][x]], innerRect)
     
-    def highLightLine(self,y):
-        rect=pygame.Rect((0,y*self.blockSize),(self.blockSize*10,self.blockSize))
-        pygame.draw.rect(self.surface, (255,255,255), rect)
-        self.screen.blit(self.surface,(0,0))
+    def highlightLine(self,y):
+        for x in range(5):
+            innerRect1=pygame.Rect(((4-x)*self.blockSize+5,y*self.blockSize+5),(self.blockSize-10,self.blockSize-10))
+            innerRect2=pygame.Rect(((5+x)*self.blockSize+5,y*self.blockSize+5),(self.blockSize-10,self.blockSize-10))
+            pygame.draw.rect(self.surface, (30,30,30), innerRect1)
+            pygame.draw.rect(self.surface, (30,30,30), innerRect2)
+            self.screen.blit(self.surface,(0,0))
+            pygame.display.update()
+            highlight_delay = 50  # milliseconds
+            last_time = pygame.time.get_ticks()
+            while True:
+                now = pygame.time.get_ticks()
+                if now-last_time>=highlight_delay:
+                    break
+        highlight_delay = 100  # milliseconds
+        last_time = pygame.time.get_ticks()
+        while True:
+            now = pygame.time.get_ticks()
+            if now-last_time>=highlight_delay:
+                break
+    
+    def highlightGameOver(self):
+        for x in range(5):
+            for y in range(20):
+                innerRect1=pygame.Rect(((4-x)*self.blockSize+5,y*self.blockSize+5),(self.blockSize-10,self.blockSize-10))
+                innerRect2=pygame.Rect(((5+x)*self.blockSize+5,y*self.blockSize+5),(self.blockSize-10,self.blockSize-10))
+                pygame.draw.rect(self.surface, (255,255,255), innerRect1)
+                pygame.draw.rect(self.surface, (255,255,255), innerRect2)
+            self.screen.blit(self.surface,(0,0))
+            highlight_delay = 100  # milliseconds
+            last_time = pygame.time.get_ticks()
+            while True:
+                now = pygame.time.get_ticks()
+                if now-last_time>=highlight_delay:
+                    break
+            pygame.display.update()
 
-    def drawScore(self,score):
-        self.textSurface = my_font1.render(f'{score}', False, (255, 255, 255))
+        highlight_delay = 500  # milliseconds
+        last_time = pygame.time.get_ticks()
+        while True:
+            now = pygame.time.get_ticks()
+            if now-last_time>=highlight_delay:
+                break
+
+    def drawScore(self,lines,score,level):
+        self.textSurface = my_font2.render(f'Score', False, (255, 255, 255))
+        self.screen.blit(self.textSurface,(310,200))
+        self.textSurface = my_font2.render(f'{score}', False, (150, 150, 150))
+        self.screen.blit(self.textSurface,(310,230))
+
+        self.textSurface = my_font2.render(f'Lines', False, (255, 255, 255))
+        self.screen.blit(self.textSurface,(310,280))
+        self.textSurface = my_font2.render(f'{lines}', False, (150, 150, 150))
+        self.screen.blit(self.textSurface,(310,310))
+
+        self.textSurface = my_font2.render(f'Level', False, (255, 255, 255))
+        self.screen.blit(self.textSurface,(310,360))
+        self.textSurface = my_font2.render(f'{level}', False, (150, 150, 150))
+        self.screen.blit(self.textSurface,(310,390))
     
     def drawGameOver(self):
         self.menuSurface = my_font1.render('GAME OVER', False, (255, 0, 0))
@@ -501,7 +567,6 @@ class Renderer:
     def updateGameScreen(self):
         self.screen.blit(self.surface,(0,0))
         self.screen.blit(self.surfacePreview,(330,0))
-        self.screen.blit(self.textSurface,(330,200))
         pygame.display.update()
 
 pygame.init()
